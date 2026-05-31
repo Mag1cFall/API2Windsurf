@@ -94,13 +94,15 @@ func (a *App) StopProxy() error {
 	return proxy.TeardownRouting()
 }
 
-// RestoreOfficialEnvironment stops the proxy and removes hosts hijacking,
-// proxy bypass entries, and the local CA so Windsurf can use the official account.
+// RestoreOfficialEnvironment stops the proxy and removes hosts hijacking and
+// proxy bypass entries so Windsurf can reach official backends with its own
+// account. The local CA is intentionally kept; remove it manually via certmgr
+// if you want a full uninstall.
 func (a *App) RestoreOfficialEnvironment() error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	a.stopProxyLocked()
-	return proxy.TeardownSystem()
+	return proxy.TeardownRouting()
 }
 
 type ModelsResult struct {

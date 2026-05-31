@@ -46,7 +46,10 @@ func (a *App) Shutdown(ctx context.Context) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	a.stopProxyLocked()
-	_ = proxy.TeardownSystem()
+	// Only restore Windsurf reachability (hosts + proxy bypass).
+	// The local CA is left installed on purpose: it's harmless without
+	// the proxy running and avoids a UAC prompt + reinstall on next launch.
+	_ = proxy.TeardownRouting()
 }
 
 func (a *App) stopProxyLocked() {

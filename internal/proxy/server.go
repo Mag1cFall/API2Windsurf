@@ -35,6 +35,7 @@ type Server struct {
 	mu       sync.RWMutex
 	cfg      Config
 	listener net.Listener
+	httpSrv  *http.Server
 	tracker  *UsageTracker
 	log      func(string)
 
@@ -63,10 +64,6 @@ func (s *Server) Start() error {
 	if err != nil {
 		return fmt.Errorf("listen %s: %w", addr, err)
 	}
-	s.mu.Lock()
-	s.listener = ln
-	s.mu.Unlock()
-
 	srv := &http.Server{
 		Handler:           s.handler(),
 		ReadHeaderTimeout: 30 * time.Second,
@@ -75,6 +72,11 @@ func (s *Server) Start() error {
 		IdleTimeout:          120 * time.Second,
 		MaxConcurrentStreams: 250,
 	})
+	s.mu.Lock()
+	s.listener = ln
+	s.httpSrv = srv
+	s.mu.Unlock()
+
 	s.log("proxy listening on " + addr)
 	go func() {
 		if err := srv.Serve(ln); err != nil && !errIsClosed(err) {
@@ -84,15 +86,27 @@ func (s *Server) Start() error {
 	return nil
 }
 
+// Stop closes the HTTP server and underlying listener, forcibly terminating
+// any in-flight or keep-alive connections so Windsurf re-resolves DNS on retry.
 func (s *Server) Stop() error {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.listener == nil {
+	srv := s.httpSrv
+	ln := s.listener
+	s.httpSrv = nil
+	s.listener = nil
+	s.mu.Unlock()
+
+	if srv == nil && ln == nil {
 		return nil
 	}
-	err := s.listener.Close()
-	s.listener = nil
-	return err
+	if srv != nil {
+		// Close (not Shutdown) so existing TLS / HTTP2 connections are
+		// reset immediately rather than waiting for client-side timeout.
+		_ = srv.Close()
+	} else if ln != nil {
+		_ = ln.Close()
+	}
+	return nil
 }
 
 func (s *Server) handler() http.Handler {

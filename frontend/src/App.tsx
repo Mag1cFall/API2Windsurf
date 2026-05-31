@@ -344,7 +344,7 @@ export default function App() {
               onClick={() => {
                 if (
                   !confirm(
-                    '将停止代理并移除 hosts 劫持、本机证书与代理例外项，Windsurf 可恢复官方账号。\n\n请完全退出并重开 Windsurf。继续？',
+                    '将停止代理并移除 hosts 劫持与代理例外项，Windsurf 可恢复使用官方账号。\n\n本机 CA 证书会保留（无害；下次启动免去再次 UAC 安装）。\n\n请完全退出并重开 Windsurf。继续？',
                   )
                 ) {
                   return
@@ -359,7 +359,7 @@ export default function App() {
               恢复官方环境
             </button>
           </div>
-          <p className="hint">退出本程序时会自动还原 hosts 与证书；停止代理也会还原 hosts，避免 Windsurf 仍指向本机。</p>
+          <p className="hint">退出本程序或点「停止代理」会自动还原 hosts，让 Windsurf 重新连官方后端。本机 CA 不会被自动卸载，需要时去 certmgr.msc 里手动删除。</p>
         </section>
 
         <section className="card">

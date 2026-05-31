@@ -18,7 +18,9 @@ Windsurf IDE ──▶ 本机代理（:443）──▶ 用户的 API 端点
 
 ## 退出与还原
 
-退出或调用「恢复官方环境」时会执行 `TeardownSystem`：删除 hosts 中的 `# api2windsurf` 行、从系统信任区卸载本地 CA、移除为劫持添加的代理例外项，并刷新 DNS。仅「停止代理」时会还原 hosts 与代理例外项，但保留 CA 以便下次快速启动。
+退出、「停止代理」、「恢复官方环境」都会执行 `TeardownRouting`：删除 hosts 中的 `# api2windsurf` 行、移除为劫持添加的代理例外项，并刷新 DNS。Windsurf 重启后即可重新连官方后端。
+
+本地 CA **不会**自动卸载——它在没有代理运行时不影响任何流量，但保留可避免每次启动重新触发 UAC 安装。如需彻底清理，用 `certmgr.msc` 或 `certutil -delstore Root "API2Windsurf Local CA"` 手动卸载。
 
 ## 请求处理
 
