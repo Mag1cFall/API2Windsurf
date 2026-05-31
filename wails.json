@@ -1,0 +1,17 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "api2windsurf",
+  "outputfilename": "api2windsurf",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "http://127.0.0.1:5174",
+  "author": {
+    "name": "api2windsurf"
+  },
+  "info": {
+    "productName": "API2Windsurf",
+    "productVersion": "1.0.0",
+    "comments": "Bring your own API key to Windsurf"
+  }
+}
