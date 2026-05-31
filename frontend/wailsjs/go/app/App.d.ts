@@ -10,6 +10,8 @@ export function GetStatus():Promise<app.StatusDTO>;
 
 export function GetUsage():Promise<app.UsageDTO>;
 
+export function RestoreOfficialEnvironment():Promise<void>;
+
 export function SaveConfig(arg1:app.Config):Promise<void>;
 
 export function SetupSystem():Promise<void>;

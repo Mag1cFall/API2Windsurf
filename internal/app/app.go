@@ -45,6 +45,11 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) Shutdown(ctx context.Context) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	a.stopProxyLocked()
+	_ = proxy.TeardownSystem()
+}
+
+func (a *App) stopProxyLocked() {
 	if a.server != nil {
 		_ = a.server.Stop()
 		a.server = nil

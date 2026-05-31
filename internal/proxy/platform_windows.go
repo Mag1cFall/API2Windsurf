@@ -39,3 +39,44 @@ func AddProxyOverride() error {
 	}
 	return k.SetStringValue("ProxyOverride", existing)
 }
+
+func RemoveProxyOverride() error {
+	k, err := registry.OpenKey(registry.CURRENT_USER, internetSettingsKey, registry.QUERY_VALUE|registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer k.Close()
+	existing, _, _ := k.GetStringValue("ProxyOverride")
+	updated := removeProxyOverrideDomains(existing, HijackDomains)
+	if updated == existing {
+		return nil
+	}
+	return k.SetStringValue("ProxyOverride", updated)
+}
+
+func removeProxyOverrideDomains(existing string, domains []string) string {
+	if existing == "" {
+		return ""
+	}
+	var kept []string
+	for _, part := range strings.Split(existing, ";") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		if proxyOverrideContainsDomain(part, domains) {
+			continue
+		}
+		kept = append(kept, part)
+	}
+	return strings.Join(kept, ";")
+}
+
+func proxyOverrideContainsDomain(part string, domains []string) bool {
+	for _, domain := range domains {
+		if strings.EqualFold(strings.TrimSpace(part), domain) {
+			return true
+		}
+	}
+	return false
+}

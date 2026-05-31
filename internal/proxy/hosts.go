@@ -63,11 +63,22 @@ func UnmapHosts() error {
 	if err != nil {
 		return fmt.Errorf("read hosts: %w", err)
 	}
+	out := stripMarkedHostsLines(string(data), hostsMarker)
+	if string(data) == out {
+		return nil
+	}
+	if err := os.WriteFile(path, []byte(out), 0o644); err != nil {
+		return fmt.Errorf("write hosts (needs privilege): %w", err)
+	}
+	return flushDNS()
+}
+
+func stripMarkedHostsLines(content, marker string) string {
 	var kept []string
-	sc := bufio.NewScanner(strings.NewReader(string(data)))
+	sc := bufio.NewScanner(strings.NewReader(content))
 	for sc.Scan() {
 		line := sc.Text()
-		if strings.Contains(line, hostsMarker) {
+		if strings.Contains(line, marker) {
 			continue
 		}
 		kept = append(kept, line)
@@ -76,10 +87,7 @@ func UnmapHosts() error {
 	if !strings.HasSuffix(out, "\n") {
 		out += "\n"
 	}
-	if err := os.WriteFile(path, []byte(out), 0o644); err != nil {
-		return fmt.Errorf("write hosts (needs privilege): %w", err)
-	}
-	return flushDNS()
+	return out
 }
 
 func flushDNS() error {

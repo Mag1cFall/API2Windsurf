@@ -38,7 +38,33 @@
 
 配置页面底部有用量统计，显示通过本工具转发的请求数和 token 数。在 Windsurf 里发一条消息后，这里出现记录就说明配置成功。
 
+## 恢复官方账号
+
+使用自定义 API 时，本工具会修改系统 hosts 并安装本地 CA。若未还原，关闭程序后 Windsurf 仍会把后端域名解析到本机，导致无法登录或使用官方模型。
+
+**自动还原（推荐）**
+
+- 直接退出 api2windsurf（点标题栏 ✕）：会自动移除 hosts 劫持、代理例外项，并卸载本地 CA。
+- 点「停止代理」：会停止本机代理并还原 hosts，便于在不退出程序时切回官方 Windsurf。
+
+**手动还原**
+
+在配置页点「恢复官方环境」，效果与退出时相同。完成后请**完全退出** Windsurf 进程再重新打开。
+
+若程序异常退出导致 hosts 未还原，可用管理员 PowerShell 执行：
+
+```powershell
+$hosts = "C:\Windows\System32\drivers\etc\hosts"
+(Get-Content $hosts) | Where-Object { $_ -notmatch 'api2windsurf' } | Set-Content $hosts
+ipconfig /flushdns
+certutil -delstore Root "API2Windsurf Local CA"
+```
+
 ## 常见问题
+
+**关闭 api2windsurf 后 Windsurf 仍无法使用官方账号**
+
+确认 hosts 中已无 `# api2windsurf` 行（见上文手动还原），并完全重启 Windsurf。
 
 **保存后 Windsurf 没变化**
 需要完全退出 Windsurf 进程再重新打开，不是只关窗口。

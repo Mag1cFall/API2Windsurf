@@ -12,4 +12,5 @@ func runHidden(name string, args ...string) error {
 	return execCommand(name, args...).Run()
 }
 
-func AddProxyOverride() error { return nil }
+func AddProxyOverride() error    { return nil }
+func RemoveProxyOverride() error { return nil }

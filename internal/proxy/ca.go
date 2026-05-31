@@ -221,6 +221,24 @@ func InstallCA() error {
 	return nil
 }
 
+func UninstallCA() error {
+	switch runtime.GOOS {
+	case "windows":
+		if err := runHidden("certutil", "-delstore", "Root", caCommonName); err != nil {
+			return fmt.Errorf("certutil del-store failed: %w", err)
+		}
+	default:
+		if err := os.Remove(linuxSystemCAPath()); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("remove system CA file: %w", err)
+		}
+		if err := runPlain("update-ca-certificates"); err != nil {
+			return fmt.Errorf("update-ca-certificates failed: %w", err)
+		}
+	}
+	InvalidateCACache()
+	return nil
+}
+
 func runPlain(name string, args ...string) error {
 	return execCommand(name, args...).Run()
 }

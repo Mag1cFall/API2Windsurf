@@ -90,12 +90,17 @@ func (a *App) StartProxy() error {
 func (a *App) StopProxy() error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	if a.server == nil {
-		return nil
-	}
-	err := a.server.Stop()
-	a.server = nil
-	return err
+	a.stopProxyLocked()
+	return proxy.TeardownRouting()
+}
+
+// RestoreOfficialEnvironment stops the proxy and removes hosts hijacking,
+// proxy bypass entries, and the local CA so Windsurf can use the official account.
+func (a *App) RestoreOfficialEnvironment() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.stopProxyLocked()
+	return proxy.TeardownSystem()
 }
 
 type ModelsResult struct {

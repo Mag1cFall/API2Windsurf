@@ -427,6 +427,15 @@ select:focus {
 .btn.primary:hover:not(:disabled) {
   background: var(--accent-deep);
 }
+.btn.danger {
+  color: var(--bad);
+  border-color: var(--bad);
+  background: var(--bad-wash);
+}
+.btn.danger:hover:not(:disabled) {
+  background: var(--bad-wash);
+  border-color: var(--bad);
+}
 .btn.mini {
   font-family: var(--mono);
   font-size: 0.75rem;

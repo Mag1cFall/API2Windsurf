@@ -18,6 +18,10 @@ export function GetUsage() {
   return window['go']['app']['App']['GetUsage']();
 }
 
+export function RestoreOfficialEnvironment() {
+  return window['go']['app']['App']['RestoreOfficialEnvironment']();
+}
+
 export function SaveConfig(arg1) {
   return window['go']['app']['App']['SaveConfig'](arg1);
 }
