@@ -11,17 +11,20 @@ import (
 )
 
 type StatusDTO struct {
-	CAInstalled   bool   `json:"ca_installed"`
-	HostsMapped   bool   `json:"hosts_mapped"`
-	ProxyRunning  bool   `json:"proxy_running"`
-	ConfigValid   bool   `json:"config_valid"`
-	ConfigError   string `json:"config_error"`
-	CACertPath    string `json:"ca_cert_path"`
-	ConfigPath    string `json:"config_path"`
-	Upstream      string `json:"upstream"`
-	Provider      string `json:"provider"`
-	Model         string `json:"model"`
-	ListenAddress string `json:"listen_address"`
+	CAInstalled     bool                `json:"ca_installed"`
+	HostsMapped     bool                `json:"hosts_mapped"`
+	ProxyRunning    bool                `json:"proxy_running"`
+	ConfigValid     bool                `json:"config_valid"`
+	ConfigError     string              `json:"config_error"`
+	CACertPath      string              `json:"ca_cert_path"`
+	ConfigPath      string              `json:"config_path"`
+	Upstream        string              `json:"upstream"`
+	Provider        string              `json:"provider"`
+	Model           string              `json:"model"`
+	ListenAddress   string              `json:"listen_address"`
+	HostsHijacks    []proxy.HostsHijack `json:"hosts_hijacks"`
+	ForeignHijack   bool                `json:"foreign_hijack"`
+	HijackScanError string              `json:"hijack_scan_error"`
 }
 
 func (a *App) GetStatus() StatusDTO {
@@ -47,7 +50,28 @@ func (a *App) GetStatus() StatusDTO {
 	} else {
 		dto.ConfigValid = true
 	}
+	if entries, err := proxy.ScanHostsHijacks(); err != nil {
+		dto.HijackScanError = err.Error()
+	} else {
+		dto.HostsHijacks = entries
+		for _, h := range entries {
+			if !strings.EqualFold(h.Marker, "api2windsurf") {
+				dto.ForeignHijack = true
+				break
+			}
+		}
+	}
 	return dto
+}
+
+// PurgeAllHostsHijacks removes every hosts line that maps a known
+// Windsurf/Codeium domain to a loopback IP, including ones added by other
+// tools. Returns the removed entries. Requires the program to run elevated.
+func (a *App) PurgeAllHostsHijacks() ([]proxy.HostsHijack, error) {
+	a.mu.Lock()
+	a.stopProxyLocked()
+	a.mu.Unlock()
+	return proxy.PurgeAllWindsurfHijacks()
 }
 
 func (a *App) GetConfig() Config {

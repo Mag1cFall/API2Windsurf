@@ -11,6 +11,13 @@ type Config = {
   max_tokens?: number
 }
 
+type HostsHijack = {
+  domain: string
+  ip: string
+  marker: string
+  line: string
+}
+
 type Status = {
   ca_installed: boolean
   hosts_mapped: boolean
@@ -21,6 +28,9 @@ type Status = {
   upstream: string
   model: string
   config_path: string
+  hosts_hijacks?: HostsHijack[]
+  foreign_hijack?: boolean
+  hijack_scan_error?: string
 }
 
 type ModelsResult = { models: string[]; count: number; error: string }
@@ -360,6 +370,53 @@ export default function App() {
             </button>
           </div>
           <p className="hint">退出本程序或点「停止代理」会自动还原 hosts，让 Windsurf 重新连官方后端。本机 CA 不会被自动卸载，需要时去 certmgr.msc 里手动删除。</p>
+
+          {st?.hosts_hijacks && st.hosts_hijacks.length > 0 && (
+            <div className={`hijack-panel ${st.foreign_hijack ? 'foreign' : ''}`}>
+              <div className="hijack-head">
+                <b>检测到 hosts 中的 Windsurf 域名劫持</b>
+                {st.foreign_hijack && (
+                  <span className="hijack-warn">⚠ 含非本程序添加的条目（其他工具残留），仅清自己的标记不能恢复 Windsurf</span>
+                )}
+              </div>
+              <ul className="hijack-list">
+                {st.hosts_hijacks.map((h, i) => (
+                  <li key={i}>
+                    <code>{h.ip}</code> <code>{h.domain}</code>
+                    <span className={`tag ${h.marker.toLowerCase() === 'api2windsurf' ? 'self' : 'foreign'}`}>
+                      {h.marker || '无标记'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="row mt">
+                <button
+                  className="btn danger"
+                  disabled={busy}
+                  onClick={() => {
+                    if (
+                      !confirm(
+                        '将清除上面列出的所有 Windsurf/Codeium 域名劫持（无论是哪个工具加的）。\n\n仅删除指向 127.0.0.1 等回环地址的劫持条目，其它 hosts 内容不动。继续？',
+                      )
+                    ) {
+                      return
+                    }
+                    void run(
+                      '清理所有 Windsurf 劫持',
+                      async () => {
+                        const removed = (await api().PurgeAllHostsHijacks()) as HostsHijack[] | null
+                        return removed
+                      },
+                      '已清除 hosts 中的 Windsurf 劫持。请完全退出并重开 Windsurf',
+                    )
+                  }}
+                >
+                  清理所有 Windsurf 劫持
+                </button>
+              </div>
+            </div>
+          )}
+          {st?.hijack_scan_error && <p className="inline err">⚠ 扫描 hosts 失败：{st.hijack_scan_error}</p>}
         </section>
 
         <section className="card">

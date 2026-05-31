@@ -18,6 +18,10 @@ export function GetUsage() {
   return window['go']['app']['App']['GetUsage']();
 }
 
+export function PurgeAllHostsHijacks() {
+  return window['go']['app']['App']['PurgeAllHostsHijacks']();
+}
+
 export function RestoreOfficialEnvironment() {
   return window['go']['app']['App']['RestoreOfficialEnvironment']();
 }

@@ -71,9 +71,14 @@ ipconfig /flushdns
 
 **关闭 api2windsurf 后 Windsurf 仍无法使用官方账号**
 
-1. 确认 hosts 中已无 `# api2windsurf` 行（见上文兜底命令）。
+1. 打开本程序，配置页中部会列出 hosts 里所有把 Windsurf/Codeium 域名指向回环地址的劫持条目，并标注是哪个工具加的。常见的「外部劫持」标记包括 `windsurf-tools-mitm`、`api2windsurf` 等。点「清理所有 Windsurf 劫持」即可一次性删掉（无论是哪个工具加的）。
 2. 任务管理器里**完全结束** Windsurf / Codeium 所有进程，再重新打开——已建立的 TCP 连接会一直指向 127.0.0.1，仅关窗口不够。
 3. 若 Windsurf 设置里手动配过 BYOK / 自定义 Provider，请删掉。
+4. 如果你装了 Clash / V2Ray 等系统代理，并启用了 fake-ip 模式，本程序停止后域名解析会指向 `198.18.x.x` 之类的伪 IP，这是正常现象，请求会经由你的代理出口走出去。
+
+**为什么有时退出了还连不上**
+
+最常见的原因不是 api2windsurf 本身——而是**另一个 MITM 工具**在过去把同样的域名劫持到了本机却忘了还原，标记不是 `# api2windsurf` 因此不会被本程序识别。1.0.2 起本程序会扫描并显示**所有**对 Windsurf 域名的回环劫持条目，可以一键清理。
 
 **保存后 Windsurf 没变化**
 需要完全退出 Windsurf 进程再重新打开，不是只关窗口。

@@ -52,6 +52,9 @@ export namespace app {
 	    provider: string;
 	    model: string;
 	    listen_address: string;
+	    hosts_hijacks: proxy.HostsHijack[];
+	    foreign_hijack: boolean;
+	    hijack_scan_error: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new StatusDTO(source);
@@ -70,7 +73,28 @@ export namespace app {
 	        this.provider = source["provider"];
 	        this.model = source["model"];
 	        this.listen_address = source["listen_address"];
+	        this.hosts_hijacks = this.convertValues(source["hosts_hijacks"], proxy.HostsHijack);
+	        this.foreign_hijack = source["foreign_hijack"];
+	        this.hijack_scan_error = source["hijack_scan_error"];
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class TestResult {
 	    ok: boolean;
@@ -133,6 +157,24 @@ export namespace app {
 
 export namespace proxy {
 	
+	export class HostsHijack {
+	    domain: string;
+	    ip: string;
+	    marker: string;
+	    line: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new HostsHijack(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.domain = source["domain"];
+	        this.ip = source["ip"];
+	        this.marker = source["marker"];
+	        this.line = source["line"];
+	    }
+	}
 	export class UsageRecord {
 	    at: string;
 	    model: string;
