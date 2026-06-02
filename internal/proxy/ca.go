@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"time"
 )
 
@@ -153,20 +154,32 @@ func writePEM(path, blockType string, der []byte, perm os.FileMode) error {
 }
 
 var (
+	caCheckMu    sync.Mutex
 	caCheckCache bool
 	caCheckAt    time.Time
 )
 
 func IsCAInstalled() bool {
+	caCheckMu.Lock()
 	if time.Since(caCheckAt) < 30*time.Second {
-		return caCheckCache
+		hit := caCheckCache
+		caCheckMu.Unlock()
+		return hit
 	}
-	caCheckCache = checkCAInstalled()
+	caCheckMu.Unlock()
+	v := checkCAInstalled()
+	caCheckMu.Lock()
+	caCheckCache = v
 	caCheckAt = time.Now()
-	return caCheckCache
+	caCheckMu.Unlock()
+	return v
 }
 
-func InvalidateCACache() { caCheckAt = time.Time{} }
+func InvalidateCACache() {
+	caCheckMu.Lock()
+	caCheckAt = time.Time{}
+	caCheckMu.Unlock()
+}
 
 func checkCAInstalled() bool {
 	if _, err := os.Stat(caCertFile()); os.IsNotExist(err) {

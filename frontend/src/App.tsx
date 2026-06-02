@@ -342,9 +342,7 @@ export default function App() {
             <button
               className="btn ghost"
               disabled={busy}
-              onClick={() =>
-                run('停止代理', () => api().StopProxy(), '代理已停止，hosts 已还原。可正常使用 Windsurf 官方账号')
-              }
+              onClick={() => run('停止代理', () => api().StopProxy(), '代理已停止，hosts 已还原。可正常使用 Windsurf 官方账号')}
             >
               停止代理
             </button>
@@ -359,17 +357,16 @@ export default function App() {
                 ) {
                   return
                 }
-                void run(
-                  '恢复官方环境',
-                  () => api().RestoreOfficialEnvironment(),
-                  '已恢复官方环境。请完全退出并重开 Windsurf',
-                )
+                void run('恢复官方环境', () => api().RestoreOfficialEnvironment(), '已恢复官方环境。请完全退出并重开 Windsurf')
               }}
             >
               恢复官方环境
             </button>
           </div>
-          <p className="hint">退出本程序或点「停止代理」会自动还原 hosts，让 Windsurf 重新连官方后端。本机 CA 不会被自动卸载，需要时去 certmgr.msc 里手动删除。</p>
+          <p className="hint">
+            退出本程序或点「停止代理」会自动还原 hosts，让 Windsurf 重新连官方后端。本机 CA 不会被自动卸载，需要时去 certmgr.msc
+            里手动删除。
+          </p>
 
           {st?.hosts_hijacks && st.hosts_hijacks.length > 0 && (
             <div className={`hijack-panel ${st.foreign_hijack ? 'foreign' : ''}`}>
@@ -383,9 +380,7 @@ export default function App() {
                 {st.hosts_hijacks.map((h, i) => (
                   <li key={i}>
                     <code>{h.ip}</code> <code>{h.domain}</code>
-                    <span className={`tag ${h.marker.toLowerCase() === 'api2windsurf' ? 'self' : 'foreign'}`}>
-                      {h.marker || '无标记'}
-                    </span>
+                    <span className={`tag ${h.marker.toLowerCase() === 'api2windsurf' ? 'self' : 'foreign'}`}>{h.marker || '无标记'}</span>
                   </li>
                 ))}
               </ul>
