@@ -64,7 +64,7 @@ func (t *UsageTracker) Recent(n int) []UsageRecord {
 		n = len(t.records)
 	}
 	out := make([]UsageRecord, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		out[i] = t.records[len(t.records)-1-i]
 	}
 	return out

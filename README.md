@@ -1,6 +1,15 @@
 # API2Windsurf
 
-在 Windsurf 里使用你自己的模型。
+[English](README.en.md) · 中文
+
+[![CI](https://github.com/Mag1cFall/API2Windsurf/actions/workflows/ci.yml/badge.svg)](https://github.com/Mag1cFall/API2Windsurf/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Mag1cFall/API2Windsurf?include_prereleases&sort=semver)](https://github.com/Mag1cFall/API2Windsurf/releases)
+[![Downloads](https://img.shields.io/github/downloads/Mag1cFall/API2Windsurf/total)](https://github.com/Mag1cFall/API2Windsurf/releases)
+[![License](https://img.shields.io/github/license/Mag1cFall/API2Windsurf)](LICENSE)
+[![Go](https://img.shields.io/github/go-mod/go-version/Mag1cFall/API2Windsurf)](go.mod)
+[![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078d4)](https://github.com/Mag1cFall/API2Windsurf/releases)
+
+在 Windsurf 里使用你自己的模型（BYOK / Bring Your Own Key）。OpenAI 兼容、Anthropic、Google Gemini 三种协议任选，支持 thinking / reasoning 透传。
 
 这是一个本地转接程序：它把 Windsurf 发往云端的对话请求拦下来，改成标准格式转发到你指定的 API 端点。Windsurf 界面照常使用，背后实际调用的是你配置的模型。整个过程对 IDE 透明，不需要改 Windsurf 的任何设置。
 
@@ -76,3 +85,7 @@ api2windsurf/
 ```bash
 go test ./...
 ```
+
+## License
+
+MIT。详见 [LICENSE](LICENSE)。变更记录见 [CHANGELOG.md](CHANGELOG.md)。
